@@ -26,24 +26,22 @@
  */
 package com.xpdustry.ksr
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
+import com.xpdustry.ksr.KotlinRelocator.Companion.storeRelocationPath
+import org.gradle.api.Action
 
-public class KotlinShadowRelocatorPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        target.plugins.withType<ShadowJavaPlugin> {
-            val shadowJar = target.tasks.named<ShadowJar>("shadowJar")
-            val shadowJarKotlinRelocation =
-                target.tasks.register<KotlinShadowRelocationTask>("shadowJarKotlinRelocation") {
-                    group = "kotlin-shadow-relocator"
-                    shadowJarTask.set(shadowJar)
-                }
-            shadowJar.configure { finalizedBy(shadowJarKotlinRelocation) }
-        }
-    }
+/**
+ * A wrapper around [ShadowJar.relocate] that will also take care of kotlin metadata. Only use it
+ * for kotlin libraries. Using it on normal JVM libraries will just increase compilation time.
+ */
+public fun ShadowJar.kotlinRelocate(
+    pattern: String,
+    destination: String,
+    configure: Action<SimpleRelocator> = Action {},
+) {
+    val delegate = SimpleRelocator(pattern, destination, ArrayList(), ArrayList())
+    configure.execute(delegate)
+    storeRelocationPath(pattern, destination)
+    relocate(KotlinRelocator(this, delegate))
 }

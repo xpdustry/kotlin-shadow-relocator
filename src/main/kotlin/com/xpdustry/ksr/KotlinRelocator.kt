@@ -31,15 +31,14 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import com.xpdustry.ksr.KotlinRelocator.Companion.storeRelocationPath
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
-import org.gradle.api.Action
 import org.objectweb.asm.ClassReader
 
-public class KotlinRelocator(private val task: ShadowJar, private val delegate: SimpleRelocator) :
+internal class KotlinRelocator(private val task: ShadowJar, private val delegate: SimpleRelocator) :
     Relocator by delegate {
+
     override fun relocatePath(context: RelocatePathContext?): String {
         return delegate.relocatePath(context).also {
             foundRelocatedSubPaths.getOrPut(task) { hashSetOf() }.add(it.substringBeforeLast('/'))
@@ -53,17 +52,14 @@ public class KotlinRelocator(private val task: ShadowJar, private val delegate: 
         }
     }
 
-    public companion object {
+    companion object {
         private val foundRelocatedSubPaths: MutableMap<ShadowJar, MutableSet<String>> = hashMapOf()
         private val relocationPaths: MutableMap<ShadowJar, MutableMap<String, String>> = hashMapOf()
 
         private fun getRelocationPaths(shadowJar: ShadowJar) =
-            relocationPaths.getOrPut(shadowJar) { hashMapOf() }
+            relocationPaths.getOrPut(shadowJar, ::hashMapOf)
 
-        internal fun ShadowJar.storeRelocationPath(
-            pattern: String,
-            destination: String,
-        ) {
+        internal fun ShadowJar.storeRelocationPath(pattern: String, destination: String) {
             val newPattern = pattern.replace('.', '/') + "/"
             val taskRelocationPaths = getRelocationPaths(this)
             val intersections = taskRelocationPaths.keys.filter { it.startsWith(newPattern) }
@@ -89,7 +85,7 @@ public class KotlinRelocator(private val task: ShadowJar, private val delegate: 
             }
         }
 
-        public fun patchMetadata(task: ShadowJar) {
+        internal fun patchMetadata(task: ShadowJar) {
             val zip = task.archiveFile.get().asFile.toPath()
             FileSystems.newFileSystem(zip, null as ClassLoader?).use { fs ->
                 foundRelocatedSubPaths[task]?.forEach {
@@ -101,22 +97,4 @@ public class KotlinRelocator(private val task: ShadowJar, private val delegate: 
             }
         }
     }
-}
-
-public fun ShadowJar.kotlinRelocate(
-    pattern: String,
-    destination: String,
-    configure: Action<SimpleRelocator>,
-) {
-    val delegate = SimpleRelocator(pattern, destination, ArrayList(), ArrayList())
-    configure.execute(delegate)
-    storeRelocationPath(pattern, destination)
-    relocate(KotlinRelocator(this, delegate))
-}
-
-public fun ShadowJar.kotlinRelocate(
-    pattern: String,
-    destination: String,
-) {
-    kotlinRelocate(pattern, destination) {}
 }

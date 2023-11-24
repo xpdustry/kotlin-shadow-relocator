@@ -26,24 +26,19 @@
  */
 package com.xpdustry.ksr
 
-import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
-import org.gradle.kotlin.dsl.withType
+import org.gradle.api.DefaultTask
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.property
 
-public class KotlinShadowRelocatorPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        target.plugins.withType<ShadowJavaPlugin> {
-            val shadowJar = target.tasks.named<ShadowJar>("shadowJar")
-            val shadowJarKotlinRelocation =
-                target.tasks.register<KotlinShadowRelocationTask>("shadowJarKotlinRelocation") {
-                    group = "kotlin-shadow-relocator"
-                    shadowJarTask.set(shadowJar)
-                }
-            shadowJar.configure { finalizedBy(shadowJarKotlinRelocation) }
-        }
+public open class KotlinShadowRelocationTask : DefaultTask() {
+
+    @get:Input public val shadowJarTask: Property<ShadowJar> = project.objects.property<ShadowJar>()
+
+    @TaskAction
+    public fun patch() {
+        KotlinRelocator.patchMetadata(shadowJarTask.get())
     }
 }
