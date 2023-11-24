@@ -43,5 +43,5 @@ public fun ShadowJar.kotlinRelocate(
     val delegate = SimpleRelocator(pattern, destination, ArrayList(), ArrayList())
     configure.execute(delegate)
     storeRelocationPath(pattern, destination)
-    relocate(KotlinRelocator(this, delegate))
+    relocate(KotlinRelocator(delegate))
 }

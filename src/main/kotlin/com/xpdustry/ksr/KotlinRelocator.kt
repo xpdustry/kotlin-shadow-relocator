@@ -26,8 +26,6 @@
  */
 package com.xpdustry.ksr
 
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
-import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -36,24 +34,9 @@ import java.nio.file.Files
 import java.nio.file.Path
 import org.objectweb.asm.ClassReader
 
-internal class KotlinRelocator(private val task: ShadowJar, private val delegate: SimpleRelocator) :
-    Relocator by delegate {
-
-    override fun relocatePath(context: RelocatePathContext?): String {
-        return delegate.relocatePath(context).also {
-            foundRelocatedSubPaths.getOrPut(task) { hashSetOf() }.add(it.substringBeforeLast('/'))
-        }
-    }
-
-    override fun relocateClass(context: RelocateClassContext?): String {
-        return delegate.relocateClass(context).also {
-            val packageName = it.substringBeforeLast('.')
-            foundRelocatedSubPaths.getOrPut(task) { hashSetOf() }.add(packageName.replace('.', '/'))
-        }
-    }
+internal class KotlinRelocator(private val delegate: SimpleRelocator) : Relocator by delegate {
 
     companion object {
-        private val foundRelocatedSubPaths: MutableMap<ShadowJar, MutableSet<String>> = hashMapOf()
         private val relocationPaths: MutableMap<ShadowJar, MutableMap<String, String>> = hashMapOf()
 
         private fun getRelocationPaths(shadowJar: ShadowJar) =
@@ -88,11 +71,8 @@ internal class KotlinRelocator(private val task: ShadowJar, private val delegate
         internal fun patchMetadata(task: ShadowJar) {
             val zip = task.archiveFile.get().asFile.toPath()
             FileSystems.newFileSystem(zip, null as ClassLoader?).use { fs ->
-                foundRelocatedSubPaths[task]?.forEach {
-                    val packagePath = fs.getPath(it)
-                    if (Files.exists(packagePath) && Files.isDirectory(packagePath)) {
-                        Files.list(packagePath).forEach { file -> task.patchFile(file) }
-                    }
+                Files.walk(fs.getPath("/")).forEach { path ->
+                    if (Files.isRegularFile(path)) task.patchFile(path)
                 }
             }
         }
