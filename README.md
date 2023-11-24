@@ -9,6 +9,8 @@ A Gradle plugin for handling Kotlin metadata relocation.
 
 ~~Stolen~~ Inspired from the [jetbrains exposed gradle plugin](https://github.com/JetBrains/exposed-intellij-plugin).
 
+> And also [Spliterash/shadow-kotlin-relocate](https://github.com/Spliterash/shadow-kotlin-relocate) for some bug fixes.
+
 ## Usage
 
 First, add the xpdustry maven repository to plugin management in your `settings.gradle.kts` file.
