@@ -23,6 +23,7 @@ dependencies {
     compileOnly(gradleApi())
     implementation("com.github.johnrengelman:shadow:8.1.1")
     implementation("org.ow2.asm:asm:9.6")
+    implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.7.0")
 }
 
 signing {

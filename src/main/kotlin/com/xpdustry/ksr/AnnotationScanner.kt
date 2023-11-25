@@ -57,13 +57,11 @@ internal class AnnotationScanner(
             val newValue =
                 when {
                     thatArray && value is String && value.startsWith("(") -> {
-                        patch.entries
-                            .fold(value) { n, u -> n.replace(u.key, u.value) }
-                            .also {
-                                if (it != value) {
-                                    wasPatched = true
-                                }
+                        patch.applyPatch(value).also {
+                            if (it != value) {
+                                wasPatched = true
                             }
+                        }
                     }
                     else -> value
                 }

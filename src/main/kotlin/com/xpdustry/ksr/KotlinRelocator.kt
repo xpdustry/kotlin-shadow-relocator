@@ -32,15 +32,25 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.name
+import kotlinx.metadata.jvm.KmModule
+import kotlinx.metadata.jvm.KmPackageParts
+import kotlinx.metadata.jvm.KotlinModuleMetadata
+import kotlinx.metadata.jvm.UnstableMetadataApi
 import org.objectweb.asm.ClassReader
 
 internal class KotlinRelocator(private val delegate: SimpleRelocator) : Relocator by delegate {
 
     companion object {
         private val relocationPaths: MutableMap<ShadowJar, MutableMap<String, String>> = hashMapOf()
+        private val relocationPackages: MutableMap<ShadowJar, MutableMap<String, String>> =
+            hashMapOf()
 
         private fun getRelocationPaths(shadowJar: ShadowJar) =
             relocationPaths.getOrPut(shadowJar, ::hashMapOf)
+
+        private fun getRelocationPackages(shadowJar: ShadowJar) =
+            relocationPackages.getOrPut(shadowJar, ::hashMapOf)
 
         internal fun ShadowJar.storeRelocationPath(pattern: String, destination: String) {
             val newPattern = pattern.replace('.', '/') + "/"
@@ -50,10 +60,10 @@ internal class KotlinRelocator(private val delegate: SimpleRelocator) : Relocato
                 "Can't relocate from $pattern to $destination as it clashes with another paths: ${intersections.joinToString()}"
             }
             taskRelocationPaths[newPattern] = destination.replace('.', '/') + "/"
+            getRelocationPackages(this)[pattern] = destination
         }
 
-        private fun ShadowJar.patchFile(file: Path) {
-            if (Files.isDirectory(file) || !file.toString().endsWith(".class")) return
+        private fun ShadowJar.patchClass(file: Path) {
             val taskRelocationPaths = getRelocationPaths(this)
             Files.newInputStream(file).use { ins ->
                 val cr = ClassReader(ins)
@@ -68,13 +78,45 @@ internal class KotlinRelocator(private val delegate: SimpleRelocator) : Relocato
             }
         }
 
+        @OptIn(UnstableMetadataApi::class)
+        private fun ShadowJar.patchKotlinModule(file: Path) {
+            val taskRelocationPaths = getRelocationPaths(this)
+            val taskRelocationPackages = getRelocationPackages(this)
+            Files.newInputStream(file).use { ins ->
+                val metadata = KotlinModuleMetadata.read(ins.readBytes())
+                val result = KmModule()
+                for ((pkg, parts) in metadata.kmModule.packageParts) {
+                    result.packageParts[taskRelocationPackages.applyPatch(pkg)] =
+                        KmPackageParts(
+                            parts.fileFacades.mapTo(
+                                mutableListOf(), taskRelocationPaths::applyPatch),
+                            parts.multiFileClassParts.entries.associateTo(mutableMapOf()) {
+                                (name, facade) ->
+                                taskRelocationPackages.applyPatch(name) to
+                                    taskRelocationPaths.applyPatch(facade)
+                            })
+                }
+                ins.close()
+                Files.delete(file)
+                Files.write(file, KotlinModuleMetadata.write(result))
+            }
+        }
+
         internal fun patchMetadata(task: ShadowJar) {
             val zip = task.archiveFile.get().asFile.toPath()
             FileSystems.newFileSystem(zip, null as ClassLoader?).use { fs ->
                 Files.walk(fs.getPath("/")).forEach { path ->
-                    if (Files.isRegularFile(path)) task.patchFile(path)
+                    if (Files.isRegularFile(path)) {
+                        if (path.name.endsWith(".class")) task.patchClass(path)
+                        if (path.name.endsWith(".kotlin_module")) task.patchKotlinModule(path)
+                    }
                 }
             }
         }
     }
 }
+
+internal fun Map<String, String>.applyPatch(value: String): String =
+    entries.fold(value) { string, replacement ->
+        string.replace(replacement.key, replacement.value)
+    }
