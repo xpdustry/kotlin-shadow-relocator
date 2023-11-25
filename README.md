@@ -5,7 +5,7 @@
 
 ## Description
 
-A Gradle plugin for handling Kotlin metadata relocation.
+A gradle plugin for handling the relocation of kotlin projects, fixing kotlin metadata and module files.
 
 ~~Stolen~~ Inspired from the [jetbrains exposed gradle plugin](https://github.com/JetBrains/exposed-intellij-plugin).
 
@@ -49,6 +49,13 @@ tasks.shadowJar {
     kotlinRelocate("com.sksamuel.hoplite", "shadow.hoplite")
 }
 ```
+
+## Limitations
+
+This plugin is designed for kotlin [mindustry](https://github.com/Anuken/Mindustry) and minecraft mods/plugins using an **un-relocated** kotlin stdlib.
+
+Also, for kotlin multiplatform projects, the relocation for [optional expectation](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-optional-expectation/)
+is not implemented (because I don't know how they work).
 
 ## Support
 

@@ -1,5 +1,5 @@
 /*
- * This file is part of KSR, a Gradle plugin for handling Kotlin metadata relocation.
+ * This file is part of KSR, a gradle plugin for handling Kotlin metadata relocation.
  *
  * MIT License
  *
