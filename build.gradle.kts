@@ -87,7 +87,7 @@ indraPluginPublishing {
     website("https://github.com/xpdustry/kotlin-shadow-relocator")
 
     plugin(
-        "kotlin-shadow-relocator",
+        project.name,
         "com.xpdustry.ksr.KotlinShadowRelocatorPlugin",
         "KSR",
         project.description,
