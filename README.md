@@ -1,7 +1,7 @@
 # kotlin-shadow-relocator
 
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/xpdustry/kotlin-shadow-relocator/build.yml?color=00b0b3&label=Build)](https://github.com/xpdustry/kotlin-shadow-relocator/actions/workflows/build.yml)
-[![Discord](https://img.shields.io/discord/653979433312452609?color=00b0b3&label=Discord)](https://discord.xpdustry.com)
+[![Discord](https://img.shields.io/discord/519293558599974912?color=00b0b3&label=Discord)](https://discord.xpdustry.com)
 
 ## Description
 
