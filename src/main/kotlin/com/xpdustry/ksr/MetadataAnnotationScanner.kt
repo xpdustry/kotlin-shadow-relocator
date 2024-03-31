@@ -37,23 +37,16 @@ internal class MetadataAnnotationScanner(
 ) : ClassVisitor(Opcodes.ASM9, cw) {
     internal var wasPatched = false
 
-    override fun visitAnnotation(
-        descriptor: String?,
-        visible: Boolean,
-    ): AnnotationVisitor? {
-        return if (descriptor == "Lkotlin/Metadata;") {
+    override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor =
+        if (descriptor == "Lkotlin/Metadata;") {
             MetadataVisitor(cw.visitAnnotation(descriptor, visible))
         } else {
             cw.visitAnnotation(descriptor, visible)
         }
-    }
 
     inner class MetadataVisitor(av: AnnotationVisitor, private val thatArray: Boolean = false) :
         AnnotationVisitor(Opcodes.ASM9, av) {
-        override fun visit(
-            name: String?,
-            value: Any?,
-        ) {
+        override fun visit(name: String, value: Any) {
             val newValue =
                 when {
                     thatArray && value is String && value.startsWith("(") -> {
@@ -68,7 +61,7 @@ internal class MetadataAnnotationScanner(
             av.visit(name, newValue)
         }
 
-        override fun visitArray(name: String?): AnnotationVisitor? {
+        override fun visitArray(name: String): AnnotationVisitor {
             return if (name == "d2") {
                 MetadataVisitor(av.visitArray(name), true)
             } else {
