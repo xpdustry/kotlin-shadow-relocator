@@ -68,7 +68,7 @@ internal class KotlinRelocator(private val delegate: SimpleRelocator) : Relocato
             Files.newInputStream(file).use { ins ->
                 val cr = ClassReader(ins)
                 val cw = PatchedClassWriter(cr, 0, taskRelocationPaths)
-                val scanner = AnnotationScanner(cw, taskRelocationPaths)
+                val scanner = MetadataAnnotationScanner(cw, taskRelocationPaths)
                 cr.accept(scanner, 0)
                 if (scanner.wasPatched || cw.wasPatched) {
                     ins.close()

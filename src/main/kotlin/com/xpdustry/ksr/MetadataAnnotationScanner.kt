@@ -31,7 +31,7 @@ import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 
-internal class AnnotationScanner(
+internal class MetadataAnnotationScanner(
     private val cw: ClassWriter,
     private val patch: Map<String, String>
 ) : ClassVisitor(Opcodes.ASM9, cw) {
