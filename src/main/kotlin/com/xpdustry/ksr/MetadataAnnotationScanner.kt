@@ -33,9 +33,9 @@ import org.objectweb.asm.Opcodes
 
 internal class MetadataAnnotationScanner(
     private val cw: ClassWriter,
-    private val patch: Map<String, String>
+    private val relocation: RelocationMap
 ) : ClassVisitor(Opcodes.ASM9, cw) {
-    internal var wasPatched = false
+    internal var wasRelocated = false
 
     override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor =
         if (descriptor == "Lkotlin/Metadata;") {
@@ -46,14 +46,12 @@ internal class MetadataAnnotationScanner(
 
     inner class MetadataVisitor(av: AnnotationVisitor, private val thatArray: Boolean = false) :
         AnnotationVisitor(Opcodes.ASM9, av) {
-        override fun visit(name: String, value: Any) {
+        override fun visit(name: String?, value: Any) {
             val newValue =
                 when {
                     thatArray && value is String && value.startsWith("(") -> {
-                        patch.applyPatch(value).also {
-                            if (it != value) {
-                                wasPatched = true
-                            }
+                        relocation.applyRelocation(value).also {
+                            if (it != value) wasRelocated = true
                         }
                     }
                     else -> value
@@ -61,12 +59,7 @@ internal class MetadataAnnotationScanner(
             av.visit(name, newValue)
         }
 
-        override fun visitArray(name: String): AnnotationVisitor {
-            return if (name == "d2") {
-                MetadataVisitor(av.visitArray(name), true)
-            } else {
-                av.visitArray(name)
-            }
-        }
+        override fun visitArray(name: String): AnnotationVisitor =
+            if (name == "d2") MetadataVisitor(av.visitArray(name), true) else av.visitArray(name)
     }
 }

@@ -30,20 +30,12 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.named
-import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
 
 public class KotlinShadowRelocatorPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.plugins.withType<ShadowJavaPlugin> {
-            val shadowJar = target.tasks.named<ShadowJar>("shadowJar")
-            val shadowJarKotlinRelocation =
-                target.tasks.register<KotlinShadowRelocationTask>("shadowJarKotlinRelocation") {
-                    group = "kotlin-shadow-relocator"
-                    shadowJarTask.set(shadowJar)
-                }
-            shadowJar.configure { finalizedBy(shadowJarKotlinRelocation) }
+            target.tasks.withType<ShadowJar> { doLast { relocateMetadata(this as ShadowJar) } }
         }
     }
 }

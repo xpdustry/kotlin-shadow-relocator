@@ -29,14 +29,11 @@ package com.xpdustry.ksr
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 
-internal class PatchedClassWriter(
-    reader: ClassReader,
-    flags: Int,
-    relocationPaths: MutableMap<String, String>
-) : ClassWriter(reader, flags) {
+internal class RelocatingClassWriter(reader: ClassReader, flags: Int, paths: RelocationMap) :
+    ClassWriter(reader, flags) {
 
-    private val patchedPaths = relocationPaths.map { "L${it.key}" to "L${it.value}" }.toMap()
-    internal var wasPatched = false
+    private val jvmPaths = paths.map { "L${it.key}" to "L${it.value}" }.toMap()
+    internal var wasRelocated = false
 
     init {
         val symbolTable = symbolTableField.get(this)
@@ -44,13 +41,10 @@ internal class PatchedClassWriter(
         entries.forEach { entryObj ->
             if (entryObj != null) {
                 (symbolValueField.get(entryObj) as? String)?.let { value ->
-                    val newValue =
-                        patchedPaths.entries.fold(value) { acc, entry ->
-                            acc.replace(entry.key, entry.value)
-                        }
+                    val newValue = jvmPaths.applyRelocation(value)
                     if (value != newValue) {
                         symbolValueField.set(entryObj, newValue)
-                        wasPatched = true
+                        wasRelocated = true
                     }
                 }
             }
