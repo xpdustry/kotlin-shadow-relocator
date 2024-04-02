@@ -48,7 +48,7 @@ jobs:
           fi
 
       - name: Publish Artifact to Xpdustry
-        if: ${{ github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' && startsWith(github.ref, 'refs/heads/master') }}
         run: ./gradlew publish
         env:
           ORG_GRADLE_PROJECT_xpdustryUsername: "${{ secrets.XPDUSTRY_MAVEN_USERNAME }}"
