@@ -1,9 +1,9 @@
 plugins {
-    id("com.diffplug.spotless") version "6.22.0"
-    kotlin("jvm") version "1.9.10"
-    id("org.jetbrains.dokka") version "1.9.10"
+    id("com.diffplug.spotless") version "6.25.0"
+    kotlin("jvm") version "1.9.23"
+    id("org.jetbrains.dokka") version "1.9.20"
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "0.20.0"
+    id("com.gradle.plugin-publish") version "1.2.1"
     id("net.kyori.indra") version "3.1.3"
     id("net.kyori.indra.git") version "3.1.3"
     id("net.kyori.indra.publishing.gradle-plugin") version "3.1.3"
@@ -22,7 +22,7 @@ repositories {
 dependencies {
     compileOnly(gradleApi())
     implementation("com.github.johnrengelman:shadow:8.1.1")
-    implementation("org.ow2.asm:asm:9.6")
+    implementation("org.ow2.asm:asm:9.7")
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
 }
 
