@@ -1,1 +1,1 @@
-rootProject.name = "ksr"
+rootProject.name = "kotlin-shadow-relocator"
