@@ -1,6 +1,6 @@
 plugins {
     id("com.diffplug.spotless") version "6.25.0"
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm") version "1.9.22"
     id("org.jetbrains.dokka") version "1.9.20"
     `java-gradle-plugin`
     id("com.gradle.plugin-publish") version "1.2.1"
