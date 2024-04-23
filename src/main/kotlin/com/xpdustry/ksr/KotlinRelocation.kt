@@ -33,6 +33,7 @@ import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.name
+import kotlinx.metadata.jvm.JvmMetadataVersion
 import kotlinx.metadata.jvm.KmModule
 import kotlinx.metadata.jvm.KmPackageParts
 import kotlinx.metadata.jvm.KotlinModuleMetadata
@@ -129,6 +130,7 @@ private fun relocateKotlinModule(file: Path, paths: RelocationMap, packages: Rel
         }
         ins.close()
         Files.delete(file)
-        Files.write(file, KotlinModuleMetadata.write(result))
+        Files.write(
+            file, KotlinModuleMetadata(result, JvmMetadataVersion.LATEST_STABLE_SUPPORTED).write())
     }
 }
