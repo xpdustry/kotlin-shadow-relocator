@@ -35,7 +35,9 @@ import org.gradle.kotlin.dsl.withType
 public class KotlinShadowRelocatorPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         target.plugins.withType<ShadowJavaPlugin> {
-            target.tasks.withType<ShadowJar> { doLast { relocateMetadata(this as ShadowJar) } }
+            target.tasks.withType<ShadowJar> {
+                doLast("relocateMetadata") { relocateMetadata(this as ShadowJar) }
+            }
         }
     }
 }
