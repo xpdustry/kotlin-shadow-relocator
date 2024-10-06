@@ -22,7 +22,7 @@ repositories {
 dependencies {
     compileOnly(gradleApi())
     compileOnly("com.github.johnrengelman:shadow:8.1.1")
-    implementation("org.ow2.asm:asm:9.7")
+    implementation("org.ow2.asm:asm:9.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
 }
 
