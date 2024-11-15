@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.xpdustry"
-version = "2.0.0" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
+version = "2.0.1" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
 description = "Gradle plugin handling Kotlin metadata relocation for Shadow"
 
 repositories {

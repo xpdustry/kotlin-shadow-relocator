@@ -2,7 +2,7 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/xpdustry/kotlin-shadow-relocator/build.yml?color=00b0b3&label=Build)](https://github.com/xpdustry/kotlin-shadow-relocator/actions/workflows/build.yml)
 [![Discord](https://img.shields.io/discord/519293558599974912?color=00b0b3&label=Discord)](https://discord.xpdustry.com)
-[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.xpdustry.ksr?color=00b0b3&logoColor=00b0b3&label=Gradle)](https://plugins.gradle.org/plugin/com.xpdustry.ksr)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.xpdustry.kotlin-shadow-relocator?color=00b0b3&logoColor=00b0b3&label=Gradle)](https://plugins.gradle.org/plugin/com.xpdustry.kotlin-shadow-relocator)
 
 ## Description
 
@@ -20,7 +20,7 @@ Simply add the plugin after [shadow](https://github.com/GradleUp/shadow) in your
 plugins {
     java
     id("com.gradleup.shadow") version "$VERSION"
-    id("com.xpdustry.ksr") version "$VERSION"
+    id("com.xpdustry.kotlin-shadow-relocator") version "$VERSION"
 }
 ```
 
