@@ -2,6 +2,7 @@
 
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/xpdustry/kotlin-shadow-relocator/build.yml?color=00b0b3&label=Build)](https://github.com/xpdustry/kotlin-shadow-relocator/actions/workflows/build.yml)
 [![Discord](https://img.shields.io/discord/519293558599974912?color=00b0b3&label=Discord)](https://discord.xpdustry.com)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.xpdustry.ksr?color=00b0b3&logoColor=00b0b3&label=Gradle)](https://plugins.gradle.org/plugin/com.xpdustry.ksr)
 
 ## Description
 
@@ -13,21 +14,7 @@ A gradle plugin for handling the relocation of kotlin projects, fixing kotlin me
 
 ## Usage
 
-First, add the xpdustry maven repository to plugin management in your `settings.gradle.kts` file.
-
-```kt
-pluginManagement {
-    repositories {
-        gradlePluginPortal()
-        maven("https://maven.xpdustry.com/releases") {
-            name = "xpdustry-releases"
-            mavenContent { releasesOnly() }
-        }
-    }
-}
-```
-
-Then invoke the plugin after [shadow](https://github.com/GradleUp/shadow) in your `build.gradle.kts` file.
+Simply add the plugin after [shadow](https://github.com/GradleUp/shadow) in your `build.gradle.kts` file.
 
 ```kt
 plugins {
@@ -47,6 +34,20 @@ tasks.shadowJar {
     relocate("com.google.gson", "shadow.gson")
     // Very nice configuration library for Kotlin
     kotlinRelocate("com.sksamuel.hoplite", "shadow.hoplite")
+}
+```
+
+If you wish to use snapshots, add our snapshot repository to plugin management in your `settings.gradle.kts` file.
+
+```kt
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven("https://maven.xpdustry.com/snapshots") {
+            name = "xpdustry-snapshots"
+            mavenContent { snapshotsOnly() }
+        }
+    }
 }
 ```
 
