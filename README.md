@@ -27,13 +27,13 @@ pluginManagement {
 }
 ```
 
-Then invoke the plugin after [shadow](https://github.com/johnrengelman/shadow) in your `build.gradle.kts` file.
+Then invoke the plugin after [shadow](https://github.com/GradleUp/shadow) in your `build.gradle.kts` file.
 
 ```kt
 plugins {
     java
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("com.xpdustry.ksr") version "1.0.0"
+    id("com.gradleup.shadow") version "$VERSION"
+    id("com.xpdustry.ksr") version "$VERSION"
 }
 ```
 
@@ -52,10 +52,14 @@ tasks.shadowJar {
 
 ## Limitations
 
-This plugin is designed for kotlin [mindustry](https://github.com/Anuken/Mindustry) and minecraft mods/plugins using an **un-relocated** kotlin stdlib.
+This plugin was designed for kotlin [mindustry](https://github.com/Anuken/Mindustry) and minecraft mods/plugins using an **un-relocated** kotlin stdlib.
+
+I can't guarantee that it will work with other kinds of project.
 
 Also, for kotlin multiplatform projects, the relocation for [optional expectation](https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-optional-expectation/)
 is not implemented (because I don't know how they work).
+
+If you are familiar with [asm](https://asm.ow2.io/) or kotlin multiplatform internals, feel free to open a PR to help address the issues.
 
 ## Support
 

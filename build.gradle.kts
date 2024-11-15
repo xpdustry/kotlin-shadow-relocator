@@ -1,9 +1,9 @@
 plugins {
     id("com.diffplug.spotless") version "6.25.0"
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "1.9.25"
     id("org.jetbrains.dokka") version "1.9.20"
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "1.2.1"
+    id("com.gradle.plugin-publish") version "1.3.0"
     id("net.kyori.indra") version "3.1.3"
     id("net.kyori.indra.git") version "3.1.3"
     id("net.kyori.indra.publishing.gradle-plugin") version "3.1.3"
@@ -12,7 +12,7 @@ plugins {
 
 group = "com.xpdustry"
 version = "2.0.0" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
-description = "Gradle plugin for handling Kotlin metadata relocation"
+description = "Gradle plugin handling Kotlin metadata relocation for Shadow"
 
 repositories {
     mavenCentral()
@@ -21,8 +21,8 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly("com.github.johnrengelman:shadow:8.1.1")
-    implementation("org.ow2.asm:asm:9.7")
+    compileOnly("com.gradleup.shadow:shadow-gradle-plugin:8.3.5")
+    implementation("org.ow2.asm:asm:9.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
 }
 
@@ -35,7 +35,7 @@ signing {
 spotless {
     kotlin {
         ktfmt().dropboxStyle()
-        licenseHeader(toLongComment(file("LICENSE_HEADER.md").readText()))
+        licenseHeaderFile(file("HEADER.txt"))
         indentWithSpaces(4)
         trimTrailingWhitespace()
         endWithNewline()
@@ -99,10 +99,3 @@ tasks.javadocJar {
     dependsOn(tasks.dokkaHtml)
     from(tasks.dokkaHtml)
 }
-
-fun toLongComment(text: String) =
-    buildString {
-        appendLine("/*")
-        text.lines().forEach { appendLine(" * ${it.trim()}") }
-        appendLine(" */")
-    }

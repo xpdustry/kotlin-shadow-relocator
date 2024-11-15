@@ -23,20 +23,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.xpdustry.ksr
-
-import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.api.Plugin
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.withType
-
-public class KotlinShadowRelocatorPlugin : Plugin<Project> {
-    override fun apply(target: Project) {
-        target.plugins.withType<ShadowJavaPlugin> {
-            target.tasks.withType<ShadowJar> {
-                doLast("relocateMetadata") { relocateMetadata(this as ShadowJar) }
-            }
-        }
-    }
-}
