@@ -3,7 +3,7 @@ plugins {
     kotlin("jvm") version "1.9.25"
     id("org.jetbrains.dokka") version "1.9.20"
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "1.3.0"
+    id("com.gradle.plugin-publish") version "1.3.1"
     id("net.kyori.indra") version "3.1.3"
     id("net.kyori.indra.git") version "3.1.3"
     id("net.kyori.indra.publishing.gradle-plugin") version "3.1.3"
