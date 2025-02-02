@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     compileOnly(gradleApi())
-    compileOnly("com.gradleup.shadow:shadow-gradle-plugin:8.3.5")
+    compileOnly("com.gradleup.shadow:shadow-gradle-plugin:8.3.6")
     implementation("org.ow2.asm:asm:9.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
 }
