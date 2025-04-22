@@ -32,7 +32,7 @@ import org.objectweb.asm.Opcodes
 
 internal class MetadataAnnotationScanner(
     private val cw: ClassWriter,
-    private val relocation: RelocationMap
+    private val relocators: List<KotlinRelocator>
 ) : ClassVisitor(Opcodes.ASM9, cw) {
     internal var wasRelocated = false
 
@@ -49,7 +49,7 @@ internal class MetadataAnnotationScanner(
             val newValue =
                 when {
                     thatArray && value is String && value.startsWith("(") -> {
-                        relocation.applyRelocation(value).also {
+                        relocators.applyClassRelocation(value).also {
                             if (it != value) wasRelocated = true
                         }
                     }

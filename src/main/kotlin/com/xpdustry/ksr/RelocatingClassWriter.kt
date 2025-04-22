@@ -28,10 +28,12 @@ package com.xpdustry.ksr
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassWriter
 
-internal class RelocatingClassWriter(reader: ClassReader, flags: Int, paths: RelocationMap) :
-    ClassWriter(reader, flags) {
+internal class RelocatingClassWriter(
+    reader: ClassReader,
+    flags: Int,
+    relocators: List<KotlinRelocator>
+) : ClassWriter(reader, flags) {
 
-    private val jvmPaths = paths.map { "L${it.key}" to "L${it.value}" }.toMap()
     internal var wasRelocated = false
 
     init {
@@ -40,7 +42,7 @@ internal class RelocatingClassWriter(reader: ClassReader, flags: Int, paths: Rel
         entries.forEach { entryObj ->
             if (entryObj != null) {
                 (symbolValueField.get(entryObj) as? String)?.let { value ->
-                    val newValue = jvmPaths.applyRelocation(value)
+                    val newValue = relocators.applyClassRelocation(value)
                     if (value != newValue) {
                         symbolValueField.set(entryObj, newValue)
                         wasRelocated = true

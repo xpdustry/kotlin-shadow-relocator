@@ -1,9 +1,9 @@
 plugins {
     id("com.diffplug.spotless") version "6.25.0"
-    kotlin("jvm") version "1.9.25"
+    kotlin("jvm") version "2.0.20"
     id("org.jetbrains.dokka") version "1.9.20"
     `java-gradle-plugin`
-    id("com.gradle.plugin-publish") version "1.3.0"
+    id("com.gradle.plugin-publish") version "1.3.1"
     id("net.kyori.indra") version "3.1.3"
     id("net.kyori.indra.git") version "3.1.3"
     id("net.kyori.indra.publishing.gradle-plugin") version "3.1.3"
@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.xpdustry"
-version = "2.0.1" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
+version = "3.0.0" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
 description = "Gradle plugin handling Kotlin metadata relocation for Shadow"
 
 repositories {
@@ -20,10 +20,11 @@ repositories {
 }
 
 dependencies {
+    implementation(kotlin("metadata-jvm"))
+    compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(gradleApi())
-    compileOnly("com.gradleup.shadow:shadow-gradle-plugin:8.3.5")
+    compileOnly("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.0-beta12")
     implementation("org.ow2.asm:asm:9.7.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0")
 }
 
 signing {
@@ -47,8 +48,8 @@ spotless {
 
 indra {
     javaVersions {
-        target(8)
-        minimumToolchain(17)
+        target(11)
+        minimumToolchain(11)
     }
 
     publishSnapshotsTo("xpdustry", "https://maven.xpdustry.com/snapshots")

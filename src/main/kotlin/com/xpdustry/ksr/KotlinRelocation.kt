@@ -26,19 +26,16 @@
 package com.xpdustry.ksr
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.name
-import kotlinx.metadata.jvm.JvmMetadataVersion
-import kotlinx.metadata.jvm.KmModule
-import kotlinx.metadata.jvm.KmPackageParts
-import kotlinx.metadata.jvm.KotlinModuleMetadata
-import kotlinx.metadata.jvm.UnstableMetadataApi
+import kotlin.metadata.jvm.*
 import org.gradle.api.Action
-import org.gradle.api.tasks.Internal
 import org.objectweb.asm.ClassReader
 
 /**
@@ -47,63 +44,46 @@ import org.objectweb.asm.ClassReader
  */
 public fun ShadowJar.kotlinRelocate(
     pattern: String,
-    shadedPattern: String,
+    destination: String,
     configure: Action<SimpleRelocator> = Action {}
 ) {
-    val relocator = KotlinRelocator(pattern, shadedPattern)
+    val relocator = KotlinRelocator(pattern, destination)
     configure.execute(relocator)
     val intersections =
-        relocators.filterIsInstance<KotlinRelocator>().filter {
-            it.pathPattern.startsWith(relocator.pathPattern)
-        }
+        relocators.get().filterIsInstance<KotlinRelocator>().filter { it.canRelocatePath(pattern) }
     require(intersections.isEmpty()) {
-        "Can't relocate from $pattern to $shadedPattern as it clashes with another paths: ${intersections.joinToString()}"
+        "Can't relocate from $pattern to $destination as it clashes with another paths: ${intersections.joinToString()}"
     }
     relocate(relocator)
 }
 
-internal typealias Relocation = Pair<String, String>
+internal fun Iterable<KotlinRelocator>.applyPathRelocation(value: String): String =
+    fold(value) { string, relocator -> relocator.relocatePath(RelocatePathContext(string)) }
 
-internal typealias RelocationMap = Map<String, String>
-
-internal fun RelocationMap.applyRelocation(value: String): String =
-    entries.fold(value) { string, replacement ->
-        string.replace(replacement.key, replacement.value)
-    }
+internal fun Iterable<KotlinRelocator>.applyClassRelocation(value: String): String =
+    fold(value) { string, relocator -> relocator.relocateClass(RelocateClassContext(string)) }
 
 @CacheableRelocator
 internal class KotlinRelocator(pattern: String, shadedPattern: String) :
-    SimpleRelocator(pattern, shadedPattern, emptyList(), emptyList()) {
-
-    @get:Internal
-    internal val paths: Relocation
-        get() = pathPattern to shadedPathPattern
-
-    @get:Internal
-    internal val packages: Relocation
-        get() = pathPattern to shadedPattern
-}
+    SimpleRelocator(pattern, shadedPattern, emptyList(), emptyList()) {}
 
 internal fun relocateMetadata(task: ShadowJar) {
-    @Suppress("SpellCheckingInspection")
-    val relocators = task.relocators.filterIsInstance<KotlinRelocator>()
-    val paths = relocators.associate(KotlinRelocator::paths)
-    val packages = relocators.associate(KotlinRelocator::packages)
+    val relocators = task.relocators.get().filterIsInstance<KotlinRelocator>()
     val zip = task.archiveFile.get().asFile.toPath()
     FileSystems.newFileSystem(zip, null as ClassLoader?).use { fs ->
         Files.walk(fs.getPath("/")).forEach { path ->
             if (!Files.isRegularFile(path)) return@forEach
-            if (path.name.endsWith(".class")) relocateClass(path, paths)
-            if (path.name.endsWith(".kotlin_module")) relocateKotlinModule(path, paths, packages)
+            if (path.name.endsWith(".class")) relocateClass(path, relocators)
+            if (path.name.endsWith(".kotlin_module")) relocateKotlinModule(path, relocators)
         }
     }
 }
 
-private fun relocateClass(file: Path, paths: RelocationMap) {
+private fun relocateClass(file: Path, relocators: List<KotlinRelocator>) {
     Files.newInputStream(file).use { ins ->
         val cr = ClassReader(ins)
-        val cw = RelocatingClassWriter(cr, 0, paths)
-        val scanner = MetadataAnnotationScanner(cw, paths)
+        val cw = RelocatingClassWriter(cr, 0, relocators)
+        val scanner = MetadataAnnotationScanner(cw, relocators)
         cr.accept(scanner, 0)
         if (scanner.wasRelocated || cw.wasRelocated) {
             ins.close()
@@ -114,17 +94,18 @@ private fun relocateClass(file: Path, paths: RelocationMap) {
 }
 
 @OptIn(UnstableMetadataApi::class)
-private fun relocateKotlinModule(file: Path, paths: RelocationMap, packages: RelocationMap) {
+private fun relocateKotlinModule(file: Path, relocators: List<KotlinRelocator>) {
     Files.newInputStream(file).use { ins ->
         val metadata = KotlinModuleMetadata.read(ins.readBytes())
         val result = KmModule()
         for ((pkg, parts) in metadata.kmModule.packageParts) {
-            result.packageParts[paths.applyRelocation(pkg)] =
+            result.packageParts[relocators.applyPathRelocation(pkg)] =
                 KmPackageParts(
-                    parts.fileFacades.mapTo(mutableListOf(), paths::applyRelocation),
+                    parts.fileFacades.mapTo(mutableListOf(), relocators::applyPathRelocation),
                     parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
                         ->
-                        packages.applyRelocation(name) to paths.applyRelocation(facade)
+                        relocators.applyPathRelocation(name) to
+                            relocators.applyPathRelocation(facade)
                     })
         }
         ins.close()
