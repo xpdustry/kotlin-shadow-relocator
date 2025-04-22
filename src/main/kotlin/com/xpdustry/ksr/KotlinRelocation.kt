@@ -44,17 +44,16 @@ import org.objectweb.asm.ClassReader
  */
 public fun ShadowJar.kotlinRelocate(
     pattern: String,
-    destination: String,
-    configure: Action<SimpleRelocator> = Action {}
+    shadedPattern: String,
+    action: Action<SimpleRelocator>? = null
 ) {
-    val relocator = KotlinRelocator(pattern, destination)
-    configure.execute(relocator)
+    val relocator = KotlinRelocator(pattern, shadedPattern)
     val intersections =
         relocators.get().filterIsInstance<KotlinRelocator>().filter { it.canRelocatePath(pattern) }
     require(intersections.isEmpty()) {
-        "Can't relocate from $pattern to $destination as it clashes with another paths: ${intersections.joinToString()}"
+        "Can't relocate from $pattern to $shadedPattern as it clashes with another paths: ${intersections.joinToString()}"
     }
-    relocate(relocator)
+    relocate(relocator, action)
 }
 
 internal fun Iterable<KotlinRelocator>.applyPathRelocation(value: String): String =
