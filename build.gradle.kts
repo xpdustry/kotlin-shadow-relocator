@@ -48,8 +48,7 @@ spotless {
 
 indra {
     javaVersions {
-        target(11)
-        minimumToolchain(11)
+        target(17)
     }
 
     publishSnapshotsTo("xpdustry", "https://maven.xpdustry.com/snapshots")

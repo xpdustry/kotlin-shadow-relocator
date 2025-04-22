@@ -65,7 +65,21 @@ internal fun Iterable<KotlinRelocator>.applyClassRelocation(value: String): Stri
 
 @CacheableRelocator
 internal class KotlinRelocator(pattern: String, shadedPattern: String) :
-    SimpleRelocator(pattern, shadedPattern, emptyList(), emptyList()) {}
+    SimpleRelocator(pattern, shadedPattern, emptyList(), emptyList()) {
+    // I hate these hacks...
+    private val shadedPattern = shadedPattern.replace('/', '.')
+    private val shadedPathPattern = shadedPattern.replace('.', '/')
+    private val pattern = pattern.replace('/', '.')
+    private val pathPattern = pattern.replace('.', '/')
+
+    // Replace all instead of first
+    override fun relocateClass(context: RelocateClassContext): String =
+        context.className.replace(pattern.toRegex(), shadedPattern)
+
+    // Replace all instead of first
+    override fun relocatePath(context: RelocatePathContext): String =
+        context.path.replace(pathPattern.toRegex(), shadedPathPattern)
+}
 
 internal fun relocateMetadata(task: ShadowJar) {
     val relocators = task.relocators.get().filterIsInstance<KotlinRelocator>()
@@ -104,7 +118,7 @@ private fun relocateKotlinModule(file: Path, relocators: List<KotlinRelocator>) 
                     parts.fileFacades.mapTo(mutableListOf(), relocators::applyPathRelocation),
                     parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
                         ->
-                        relocators.applyPathRelocation(name) to
+                        relocators.applyClassRelocation(name) to
                             relocators.applyPathRelocation(facade)
                     })
         }

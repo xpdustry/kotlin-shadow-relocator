@@ -42,7 +42,7 @@ internal class RelocatingClassWriter(
         entries.forEach { entryObj ->
             if (entryObj != null) {
                 (symbolValueField.get(entryObj) as? String)?.let { value ->
-                    val newValue = relocators.applyClassRelocation(value)
+                    val newValue = relocators.applyPathRelocation(value)
                     if (value != newValue) {
                         symbolValueField.set(entryObj, newValue)
                         wasRelocated = true

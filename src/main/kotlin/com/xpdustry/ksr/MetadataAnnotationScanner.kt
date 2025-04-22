@@ -49,7 +49,7 @@ internal class MetadataAnnotationScanner(
             val newValue =
                 when {
                     thatArray && value is String && value.startsWith("(") -> {
-                        relocators.applyClassRelocation(value).also {
+                        relocators.applyPathRelocation(value).also {
                             if (it != value) wasRelocated = true
                         }
                     }
