@@ -32,7 +32,7 @@ import org.objectweb.asm.Opcodes
 
 internal class MetadataAnnotationScanner(
     private val cw: ClassWriter,
-    private val relocators: List<KotlinRelocator>
+    private val relocators: List<KotlinRelocator>,
 ) : ClassVisitor(Opcodes.ASM9, cw) {
     internal var wasRelocated = false
 

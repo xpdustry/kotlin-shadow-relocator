@@ -45,7 +45,7 @@ import org.objectweb.asm.ClassReader
 public fun ShadowJar.kotlinRelocate(
     pattern: String,
     shadedPattern: String,
-    action: Action<SimpleRelocator>? = null
+    action: Action<SimpleRelocator>? = null,
 ) {
     val relocator = KotlinRelocator(pattern, shadedPattern)
     val intersections =
@@ -119,11 +119,14 @@ private fun relocateKotlinModule(file: Path, relocators: List<KotlinRelocator>) 
                         ->
                         relocators.applyClassRelocation(name) to
                             relocators.applyPathRelocation(facade)
-                    })
+                    },
+                )
         }
         ins.close()
         Files.delete(file)
         Files.write(
-            file, KotlinModuleMetadata(result, JvmMetadataVersion.LATEST_STABLE_SUPPORTED).write())
+            file,
+            KotlinModuleMetadata(result, JvmMetadataVersion.LATEST_STABLE_SUPPORTED).write(),
+        )
     }
 }

@@ -1,7 +1,7 @@
 plugins {
-    id("com.diffplug.spotless") version "6.25.0"
-    kotlin("jvm") version "2.0.20"
-    id("org.jetbrains.dokka") version "1.9.20"
+    id("com.diffplug.spotless") version "7.0.4"
+    kotlin("jvm") version "2.0.21"
+    id("org.jetbrains.dokka") version "2.0.0"
     `java-gradle-plugin`
     id("com.gradle.plugin-publish") version "1.3.1"
     id("net.kyori.indra") version "3.1.3"
@@ -23,8 +23,8 @@ dependencies {
     implementation(kotlin("metadata-jvm"))
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(gradleApi())
-    compileOnly("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.0-beta12")
-    implementation("org.ow2.asm:asm:9.7.1")
+    compileOnly("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.0-rc1")
+    implementation("org.ow2.asm:asm:9.8")
 }
 
 signing {
@@ -35,9 +35,9 @@ signing {
 
 spotless {
     kotlin {
-        ktfmt().dropboxStyle()
+        ktfmt().kotlinlangStyle()
         licenseHeaderFile(file("HEADER.txt"))
-        indentWithSpaces(4)
+        leadingTabsToSpaces(4)
         trimTrailingWhitespace()
         endWithNewline()
     }
@@ -96,6 +96,5 @@ indraPluginPublishing {
 }
 
 tasks.javadocJar {
-    dependsOn(tasks.dokkaHtml)
-    from(tasks.dokkaHtml)
+    from(tasks.dokkaGeneratePublicationHtml)
 }

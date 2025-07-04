@@ -31,7 +31,7 @@ import org.objectweb.asm.ClassWriter
 internal class RelocatingClassWriter(
     reader: ClassReader,
     flags: Int,
-    relocators: List<KotlinRelocator>
+    relocators: List<KotlinRelocator>,
 ) : ClassWriter(reader, flags) {
 
     internal var wasRelocated = false
