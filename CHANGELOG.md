@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/),
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## v3.0.0-rc.2 - 2025-07-26
+
+### Bugfixes
+
+- Updated Shadow to `rc2` in order to fix ABI incompatibility (https://github.com/xpdustry/kotlin-shadow-relocator/pull/31).
+
 ## v3.0.0-rc.1 - 2025-07-04
 
 ### Bugfixes
