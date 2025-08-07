@@ -4,14 +4,14 @@ plugins {
     id("org.jetbrains.dokka") version "2.0.0"
     `java-gradle-plugin`
     id("com.gradle.plugin-publish") version "1.3.1"
-    id("net.kyori.indra") version "3.1.3"
-    id("net.kyori.indra.git") version "3.1.3"
-    id("net.kyori.indra.publishing.gradle-plugin") version "3.1.3"
+    id("net.kyori.indra") version "3.2.0"
+    id("net.kyori.indra.git") version "3.2.0"
+    id("net.kyori.indra.publishing.gradle-plugin") version "3.2.0"
     `kotlin-dsl`
 }
 
 group = "com.xpdustry"
-version = "3.0.0-rc.2" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
+version = "3.0.0" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
 description = "Gradle plugin handling Kotlin metadata relocation for Shadow"
 
 repositories {
@@ -23,7 +23,7 @@ dependencies {
     implementation(kotlin("metadata-jvm"))
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(gradleApi())
-    compileOnly("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.0-rc2")
+    compileOnly("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.0")
     implementation("org.ow2.asm:asm:9.8")
 }
 

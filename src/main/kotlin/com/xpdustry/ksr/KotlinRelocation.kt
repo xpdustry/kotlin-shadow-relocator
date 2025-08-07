@@ -53,7 +53,11 @@ public fun ShadowJar.kotlinRelocate(
     require(intersections.isEmpty()) {
         "Can't relocate from $pattern to $shadedPattern as it clashes with another paths: ${intersections.joinToString()}"
     }
-    relocate(relocator, action)
+    if (action != null) {
+        relocate(relocator, action)
+    } else {
+        relocate(relocator)
+    }
 }
 
 internal fun Iterable<KotlinRelocator>.applyPathRelocation(value: String): String =
