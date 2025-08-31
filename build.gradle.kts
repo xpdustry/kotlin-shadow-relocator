@@ -23,7 +23,7 @@ dependencies {
     implementation(kotlin("metadata-jvm"))
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(gradleApi())
-    compileOnly("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.0.0")
+    compileOnly("com.gradleup.shadow:com.gradleup.shadow.gradle.plugin:9.1.0")
     implementation("org.ow2.asm:asm:9.8")
 }
 
