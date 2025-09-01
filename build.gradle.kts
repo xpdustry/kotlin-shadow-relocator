@@ -1,6 +1,6 @@
 plugins {
     id("com.diffplug.spotless") version "7.2.1"
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.2.10"
     id("org.jetbrains.dokka") version "2.0.0"
     `java-gradle-plugin`
     id("com.gradle.plugin-publish") version "1.3.1"
@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "com.xpdustry"
-version = "3.0.0" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
+version = "3.1.0" + if (indraGit.headTag() == null) "-SNAPSHOT" else ""
 description = "Gradle plugin handling Kotlin metadata relocation for Shadow"
 
 repositories {
