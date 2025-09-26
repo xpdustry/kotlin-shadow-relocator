@@ -4,6 +4,16 @@
 [![Discord](https://img.shields.io/discord/519293558599974912?color=00b0b3&label=Discord)](https://discord.xpdustry.com)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.xpdustry.kotlin-shadow-relocator?color=00b0b3&logoColor=00b0b3&label=Gradle)](https://plugins.gradle.org/plugin/com.xpdustry.kotlin-shadow-relocator)
 
+> [!Warning]
+>
+> Kotlin relocation is now supported by shadow since version [9.2.1](https://github.com/GradleUp/shadow/releases/tag/9.2.1).
+>
+> In order to use it, remove KSR from your build scripts and replace `kotlinRelocate` calls with just `relocate`.
+> 
+> Thank [@goooler](https://github.com/Goooler) for the excellent work he put into integrating KSR functionalities into shadow.
+>
+> KSR is therefore deprecated and will be archived at the end of october 2025.
+
 ## Description
 
 A gradle plugin for handling the relocation of kotlin projects, fixing kotlin metadata and module files.
